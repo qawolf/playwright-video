@@ -3,15 +3,15 @@
   "name": "playwright-video",
   "license": "BSD-3.0",
   "version": "0.1.4",
-  "description": "Captures a video of a Playwright page",
-  "main": "./build/src/index.js",
-  "types": "./build/src/index.d.ts",
+  "description": "Capture a video of a Playwright page",
+  "main": "./build/index.js",
+  "types": "./build/index.d.ts",
   "files": [
     "build",
     "src"
   ],
   "engines": {
-    "node": ">= 12.13 <13"
+    "node": ">=10.15.0"
   },
   "scripts": {
     "clean": "rimraf coverage build tmp",
