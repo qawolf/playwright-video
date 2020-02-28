@@ -19,10 +19,10 @@ npm i playwright playwright-video
 ## Use
 
 ```js
-import { chromium } from 'playwright';
-import { VideoCapture } from 'playwright-video';
+const { chromium, devices } = require('playwright');
+const { VideoCapture } = require('playwright-video');
 
-(async (): Promise<void> => {
+(async () => {
   const iPhone = devices['iPhone 6'];
 
   const browser = await chromium.launch();
