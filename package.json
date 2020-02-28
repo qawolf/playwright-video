@@ -18,8 +18,10 @@
     "build": "tsc -p tsconfig.release.json",
     "build:watch": "tsc -w -p tsconfig.release.json",
     "lint": "eslint . --ext .ts,.tsx",
+    "release": "np --no-cleanup",
     "test": "jest --coverage",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "version": "npm run clean && npm run build"
   },
   "peerDependencies": {
     "playwright-core": "0.11.1"
@@ -41,6 +43,7 @@
     "eslint-plugin-jest": "~23.7.0",
     "ffmpeg-static": "^4.0.1",
     "jest": "~25.1.0",
+    "np": "^6.2.0",
     "playwright": "0.11.1",
     "prettier": "~1.19.1",
     "rimraf": "~3.0.2",
