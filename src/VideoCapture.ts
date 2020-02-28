@@ -26,7 +26,7 @@ export class VideoCapture {
   // public for tests
   public _client: CRSession;
   private _endedPromise: Promise<void>;
-  private _inputFps: number = 25;
+  private _inputFps = 25;
   private _lastFrame: Frame;
   private _page: Page;
   // public for tests
@@ -85,9 +85,14 @@ export class VideoCapture {
         sessionId: payload.sessionId,
       });
 
+      if (!payload.metadata.timestamp) {
+        debug('skip frame without timestamp');
+        return;
+      }
+
       this._writeFrame({
         data: Buffer.from(payload.data, 'base64'),
-        timestamp: payload.metadata.timestamp!,
+        timestamp: payload.metadata.timestamp,
         time: Date.now(),
       });
     });
