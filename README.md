@@ -42,7 +42,7 @@ const { VideoCapture } = require('playwright-video');
   await page.goto('http://example.org');
 
   await Promise.all([
-    page.waitForNavigation({ waitUntil: 'load' }),
+    page.waitForNavigation({ waitUntil: 'networkidle0' }),
     page.click('a'),
   ]);
 
