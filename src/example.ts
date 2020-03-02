@@ -1,5 +1,5 @@
 import { chromium, devices } from 'playwright-core';
-import { VideoCapture } from './VideoCapture.old';
+import { VideoCapture } from './VideoCapture';
 
 (async (): Promise<void> => {
   const iPhone = devices['iPhone 6'];
@@ -12,7 +12,7 @@ import { VideoCapture } from './VideoCapture.old';
 
   const page = await context.newPage();
 
-  await VideoCapture.start({
+  const capture = await VideoCapture.start({
     browser,
     page,
     savePath: '/tmp/video.mp4',
@@ -26,4 +26,6 @@ import { VideoCapture } from './VideoCapture.old';
   ]);
 
   await browser.close();
+
+  await capture.stop();
 })();

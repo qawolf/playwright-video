@@ -1,41 +1,82 @@
 import Debug from 'debug';
 import { EventEmitter } from 'events';
+import { Page } from 'playwright-core';
+import { CRBrowser } from 'playwright-core/lib/chromium/crBrowser';
+import { CRSession } from 'playwright-core/lib/chromium/crConnection';
+import { ensureBrowserType } from './utils';
 
 const debug = Debug('playwright-video:FrameCollector');
 
-// basically emits frames
-// test that it emits frames given a page
-export class FrameCollector extends EventEmitter {
-  public static async create(): Promise<FrameCollector> {
-    // this._client = await browser.pageTarget(this._page).createCDPSession();
+interface ConstructorArgs {
+  browser: CRBrowser;
+  page: Page;
+}
+
+// TODO test that it emits frames given a page
+export class ScreencastFrameCollector extends EventEmitter {
+  public static async create(
+    args: ConstructorArgs,
+  ): Promise<ScreencastFrameCollector> {
+    ensureBrowserType(args.browser);
+
+    const frameCollector = new ScreencastFrameCollector(args);
+    await frameCollector._buildClient(args.browser);
+
+    return frameCollector;
   }
 
-  // private _client: xxx
+  private _client: CRSession;
+  private _page: Page;
 
-  protected constructor() {
+  protected constructor({ page }: ConstructorArgs) {
     super();
+    this._page = page;
+  }
 
-    // this._client.on('Page.screencastFrame', payload => {
-    //     this._client.send('Page.screencastFrameAck', {
-    //       sessionId: payload.sessionId,
-    //     });
+  private async _buildClient(browser: CRBrowser): Promise<void> {
+    this._client = await browser.pageTarget(this._page).createCDPSession();
 
-    //     if (!payload.metadata.timestamp) {
-    //       debug('skip frame without timestamp');
-    //       return;
-    //     }
+    this._listenForFrames();
+  }
 
-    //     this.emit('frame', {
-    //       data: Buffer.from(payload.data, 'base64'),
-    //       timestamp: payload.metadata.timestamp,
-    //       received: Date.now(),
-    //     });
-    //   });
+  private _listenForFrames(): void {
+    this._client.on('Page.screencastFrame', payload => {
+      debug(`received frame with timestamp ${payload.metadata.timestamp}`);
+
+      this._client.send('Page.screencastFrameAck', {
+        sessionId: payload.sessionId,
+      });
+
+      if (!payload.metadata.timestamp) {
+        debug('skip frame without timestamp');
+        return;
+      }
+
+      this.emit('screencastframe', {
+        data: Buffer.from(payload.data, 'base64'),
+        received: Date.now(),
+        timestamp: payload.metadata.timestamp,
+      });
+    });
   }
 
   public async start(): Promise<void> {
-    // await this._client.send('Page.startScreencast', {
-    //     everyNthFrame: 1,
-    //   });
+    debug('start screencast');
+
+    await this._client.send('Page.startScreencast', {
+      everyNthFrame: 1,
+    });
+  }
+
+  public async stop(): Promise<void> {
+    debug('stop screencast');
+    // Screencast API takes time to send frames
+    // Wait 1s for frames to arrive
+    // TODO figure out a better pattern for this
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    if (this._client._connection) {
+      await this._client.detach();
+    }
   }
 }

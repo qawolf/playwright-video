@@ -1,7 +1,15 @@
-import { ScreencastFrame } from './types';
+import Debug from 'debug';
+
+const debug = Debug('playwright-video:VideoFrameBuilder');
+
+interface ScreencastFrame {
+  data: Buffer;
+  received: number;
+  timestamp: number;
+}
 
 export class VideoFrameBuilder {
-  private _fps = 25;
+  private _framesPerSecond = 25;
   private _previousFrame?: ScreencastFrame;
 
   private _getFrameCount(screencastFrame?: ScreencastFrame): number {
@@ -14,17 +22,25 @@ export class VideoFrameBuilder {
       durationSeconds = (Date.now() - this._previousFrame.received) / 1000;
     }
 
-    return Math.round(durationSeconds * this._fps);
+    const frameCount = Math.round(durationSeconds * this._framesPerSecond);
+    if (frameCount < 0) {
+      debug(`frames out of order: frameCount ${frameCount}`);
+      return 0;
+    }
+
+    return frameCount;
   }
 
   public buildVideoFrames(screencastFrame?: ScreencastFrame): Buffer[] {
     if (!this._previousFrame) {
+      debug('first frame received: waiting for more');
       this._previousFrame = screencastFrame;
       return [];
     }
 
     const frameCount = this._getFrameCount(screencastFrame);
     const frames = Array(frameCount).fill(this._previousFrame.data);
+    debug(`returning ${frames.length} frames`);
 
     this._previousFrame = screencastFrame;
 
