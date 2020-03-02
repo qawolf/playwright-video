@@ -1,8 +1,11 @@
+import Debug from 'debug';
 import { Page } from 'playwright-core';
 import { CRBrowser } from 'playwright-core/lib/chromium/crBrowser';
 import { ScreencastFrameCollector } from './ScreencastFrameCollector';
 import { VideoFrameBuilder } from './VideoFrameBuilder';
 import { VideoWriter } from './VideoWriter';
+
+const debug = Debug('playwright-video:PageVideoCapture');
 
 interface ConstructorArgs {
   collector: ScreencastFrameCollector;
@@ -15,16 +18,22 @@ interface CreateArgs {
   savePath: string;
 }
 
-export class VideoCapture {
+export class PageVideoCapture {
   public static async start({
     browser,
     page,
     savePath,
-  }: CreateArgs): Promise<VideoCapture> {
+  }: CreateArgs): Promise<PageVideoCapture> {
     const collector = await ScreencastFrameCollector.create({ browser, page });
     const writer = await VideoWriter.create(savePath);
 
-    return new VideoCapture({ collector, writer });
+    const capture = new PageVideoCapture({ collector, writer });
+    page.on('close', () => capture.stop());
+
+    debug('start video capture');
+    await collector.start();
+
+    return capture;
   }
 
   private _collector: ScreencastFrameCollector;
@@ -40,6 +49,7 @@ export class VideoCapture {
 
   private _listenForFrames(): void {
     this._collector.on('screencastframe', screencastFrame => {
+      debug(`received frame: ${screencastFrame.timestamp}`);
       const videoFrames = this._frameBuilder.buildVideoFrames(screencastFrame);
 
       this._writer.write(videoFrames);
@@ -47,6 +57,7 @@ export class VideoCapture {
   }
 
   public async stop(): Promise<void> {
+    debug('stop video capture');
     await this._collector.stop();
 
     return this._writer.stop();
