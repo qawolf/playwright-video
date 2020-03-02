@@ -18,10 +18,12 @@ export class ScreencastFrameCollector extends EventEmitter {
   ): Promise<ScreencastFrameCollector> {
     ensureBrowserType(args.browser);
 
-    const frameCollector = new ScreencastFrameCollector(args);
-    await frameCollector._buildClient(args.browser);
+    const collector = new ScreencastFrameCollector(args);
 
-    return frameCollector;
+    await collector._buildClient(args.browser);
+    collector._listenForFrames();
+
+    return collector;
   }
 
   private _client: CRSession;
@@ -35,8 +37,6 @@ export class ScreencastFrameCollector extends EventEmitter {
 
   private async _buildClient(browser: CRBrowser): Promise<void> {
     this._client = await browser.pageTarget(this._page).createCDPSession();
-
-    this._listenForFrames();
   }
 
   private _listenForFrames(): void {
