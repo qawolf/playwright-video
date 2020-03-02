@@ -9,6 +9,7 @@ const debug = Debug('playwright-video:PageVideoCapture');
 
 interface ConstructorArgs {
   collector: ScreencastFrameCollector;
+  page: Page;
   writer: VideoWriter;
 }
 
@@ -29,9 +30,7 @@ export class PageVideoCapture {
     const collector = await ScreencastFrameCollector.create({ browser, page });
     const writer = await VideoWriter.create(savePath);
 
-    const capture = new PageVideoCapture({ collector, writer });
-    page.on('close', () => capture.stop());
-
+    const capture = new PageVideoCapture({ collector, page, writer });
     await collector.start();
 
     return capture;
@@ -42,7 +41,7 @@ export class PageVideoCapture {
   private _stopped = false;
   private _writer: VideoWriter;
 
-  protected constructor({ collector, writer }: ConstructorArgs) {
+  protected constructor({ collector, page, writer }: ConstructorArgs) {
     this._collector = collector;
     this._writer = writer;
 
@@ -50,6 +49,8 @@ export class PageVideoCapture {
       debug('stop due to ffmpeg error');
       this.stop();
     });
+    page.on('close', () => this.stop());
+
     this._listenForFrames();
   }
 
@@ -65,8 +66,8 @@ export class PageVideoCapture {
   public async stop(): Promise<void> {
     if (this._stopped) return;
 
-    this._stopped = true;
     debug('stop');
+    this._stopped = true;
 
     await this._collector.stop();
     return this._writer.stop();

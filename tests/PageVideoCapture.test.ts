@@ -1,3 +1,3 @@
 describe('PageVideoCapture', () => {
-  it('records a video of the page', async () => {});
+  it('captures a video of the page', async () => {});
 });
