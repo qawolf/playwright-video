@@ -38,7 +38,8 @@ export class PageVideoCapture {
 
   private _collector: ScreencastFrameCollector;
   private _frameBuilder: VideoFrameBuilder = new VideoFrameBuilder();
-  private _stopped = false;
+  // public for tests
+  public _stopped = false;
   private _writer: VideoWriter;
 
   protected constructor({ collector, page, writer }: ConstructorArgs) {
@@ -63,6 +64,13 @@ export class PageVideoCapture {
     });
   }
 
+  private _writeLastFrame(): void {
+    debug('write last frame');
+
+    const videoFrames = this._frameBuilder.buildVideoFrames();
+    this._writer.write(videoFrames);
+  }
+
   public async stop(): Promise<void> {
     if (this._stopped) return;
 
@@ -70,6 +78,8 @@ export class PageVideoCapture {
     this._stopped = true;
 
     await this._collector.stop();
+    this._writeLastFrame();
+
     return this._writer.stop();
   }
 }

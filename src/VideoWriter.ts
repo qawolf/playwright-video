@@ -69,6 +69,8 @@ export class VideoWriter extends EventEmitter {
   }
 
   public write(frames: Buffer[]): void {
+    debug(`write ${frames.length} frames`);
+
     if (frames.length && !this._receivedFrame) {
       this._receivedFrame = true;
     }

@@ -26,7 +26,8 @@ export class ScreencastFrameCollector extends EventEmitter {
     return collector;
   }
 
-  private _client: CRSession;
+  // public for tests
+  public _client: CRSession;
   private _page: Page;
   private _stopped = false;
 
