@@ -1,5 +1,4 @@
 import Debug from 'debug';
-import { EventEmitter } from 'events';
 import { Page } from 'playwright-core';
 import { CRBrowser } from 'playwright-core/lib/chromium/crBrowser';
 import { ScreencastFrameCollector } from './ScreencastFrameCollector';
@@ -19,13 +18,13 @@ interface CreateArgs {
   savePath: string;
 }
 
-export class PageVideoCapture extends EventEmitter {
+export class PageVideoCapture {
   public static async start({
     browser,
     page,
     savePath,
   }: CreateArgs): Promise<PageVideoCapture> {
-    debug('start video capture');
+    debug('start');
 
     const collector = await ScreencastFrameCollector.create({ browser, page });
     const writer = await VideoWriter.create(savePath);
@@ -40,15 +39,17 @@ export class PageVideoCapture extends EventEmitter {
 
   private _collector: ScreencastFrameCollector;
   private _frameBuilder: VideoFrameBuilder = new VideoFrameBuilder();
+  private _stopped = false;
   private _writer: VideoWriter;
 
   protected constructor({ collector, writer }: ConstructorArgs) {
-    super();
-
     this._collector = collector;
     this._writer = writer;
 
-    this.on('ffmpegerror', () => this.stop());
+    this._writer.on('ffmpegerror', () => {
+      debug('stop due to ffmpeg error');
+      this.stop();
+    });
     this._listenForFrames();
   }
 
@@ -62,9 +63,12 @@ export class PageVideoCapture extends EventEmitter {
   }
 
   public async stop(): Promise<void> {
-    debug('stop video capture');
-    await this._collector.stop();
+    if (this._stopped) return;
 
+    this._stopped = true;
+    debug('stop');
+
+    await this._collector.stop();
     return this._writer.stop();
   }
 }

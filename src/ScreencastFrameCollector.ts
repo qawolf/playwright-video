@@ -26,6 +26,7 @@ export class ScreencastFrameCollector extends EventEmitter {
 
   private _client: CRSession;
   private _page: Page;
+  private _stopped = false;
 
   protected constructor({ page }: ConstructorArgs) {
     super();
@@ -60,7 +61,7 @@ export class ScreencastFrameCollector extends EventEmitter {
   }
 
   public async start(): Promise<void> {
-    debug('start screencast');
+    debug('start');
 
     await this._client.send('Page.startScreencast', {
       everyNthFrame: 1,
@@ -68,7 +69,10 @@ export class ScreencastFrameCollector extends EventEmitter {
   }
 
   public async stop(): Promise<void> {
-    debug('stop screencast');
+    if (this._stopped) return;
+
+    debug('stop');
+    this._stopped = true;
     // Screencast API takes time to send frames
     // Wait 1s for frames to arrive
     // TODO figure out a better pattern for this
