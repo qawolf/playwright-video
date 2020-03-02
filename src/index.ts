@@ -1,2 +1,2 @@
 export { getFfmpegPath } from './utils';
-export { VideoCapture } from './VideoCapture';
+export { VideoCapture } from './VideoCapture.old';

@@ -1,5 +1,5 @@
 import { chromium, devices } from 'playwright-core';
-import { VideoCapture } from './VideoCapture';
+import { VideoCapture } from './VideoCapture.old';
 
 (async (): Promise<void> => {
   const iPhone = devices['iPhone 6'];
