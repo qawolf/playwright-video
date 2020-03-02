@@ -51,7 +51,7 @@ export class VideoCapture {
   }
 
   private _captureVideo(savePath: string): void {
-    debug(`capture video to ${savePath} at ${this._inputFps}fps`);
+    debug(`write video to ${savePath} at ${this._inputFps}fps`);
 
     this._endedPromise = new Promise((resolve, reject) => {
       ffmpeg({ source: this._stream, priority: 20 })

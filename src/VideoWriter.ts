@@ -1,4 +1,5 @@
 import Debug from 'debug';
+import { EventEmitter } from 'events';
 import * as ffmpeg from 'fluent-ffmpeg';
 import { ensureDir } from 'fs-extra';
 import { dirname } from 'path';
@@ -7,7 +8,7 @@ import { ensureFfmpegPath } from './utils';
 
 const debug = Debug('playwright-video:VideoWriter');
 
-export class VideoWriter {
+export class VideoWriter extends EventEmitter {
   public static async create(savePath: string): Promise<VideoWriter> {
     await ensureDir(dirname(savePath));
 
@@ -21,12 +22,14 @@ export class VideoWriter {
   private _stream: PassThrough = new PassThrough();
 
   protected constructor(savePath: string) {
+    super();
+
     ensureFfmpegPath();
-    this._captureVideo(savePath);
+    this._writeVideo(savePath);
   }
 
-  private _captureVideo(savePath: string): void {
-    debug(`capture video to ${savePath}`);
+  private _writeVideo(savePath: string): void {
+    debug(`write video to ${savePath}`);
 
     this._endedPromise = new Promise((resolve, reject) => {
       ffmpeg({ source: this._stream, priority: 20 })
@@ -35,7 +38,7 @@ export class VideoWriter {
         .inputFPS(this._framesPerSecond)
         .outputOptions('-preset ultrafast')
         .on('error', e => {
-          this.stop();
+          this.emit('ffmpegerror');
 
           // do not reject as a result of not having frames
           if (

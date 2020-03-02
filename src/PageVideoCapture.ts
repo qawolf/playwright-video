@@ -1,4 +1,5 @@
 import Debug from 'debug';
+import { EventEmitter } from 'events';
 import { Page } from 'playwright-core';
 import { CRBrowser } from 'playwright-core/lib/chromium/crBrowser';
 import { ScreencastFrameCollector } from './ScreencastFrameCollector';
@@ -18,19 +19,20 @@ interface CreateArgs {
   savePath: string;
 }
 
-export class PageVideoCapture {
+export class PageVideoCapture extends EventEmitter {
   public static async start({
     browser,
     page,
     savePath,
   }: CreateArgs): Promise<PageVideoCapture> {
+    debug('start video capture');
+
     const collector = await ScreencastFrameCollector.create({ browser, page });
     const writer = await VideoWriter.create(savePath);
 
     const capture = new PageVideoCapture({ collector, writer });
     page.on('close', () => capture.stop());
 
-    debug('start video capture');
     await collector.start();
 
     return capture;
@@ -41,9 +43,12 @@ export class PageVideoCapture {
   private _writer: VideoWriter;
 
   protected constructor({ collector, writer }: ConstructorArgs) {
+    super();
+
     this._collector = collector;
     this._writer = writer;
 
+    this.on('ffmpegerror', () => this.stop());
     this._listenForFrames();
   }
 

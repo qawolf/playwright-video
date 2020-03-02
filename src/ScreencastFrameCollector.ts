@@ -12,7 +12,6 @@ interface ConstructorArgs {
   page: Page;
 }
 
-// TODO test that it emits frames given a page
 export class ScreencastFrameCollector extends EventEmitter {
   public static async create(
     args: ConstructorArgs,
