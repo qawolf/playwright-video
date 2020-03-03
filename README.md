@@ -47,3 +47,40 @@ const { capturePage } = require('playwright-video');
 ```
 
 The video will be saved at the specified `savePath` (`/tmp/video.mp4` in the above example).
+
+## API
+
+#### playwright-video.capturePage([options])
+
+- `options` <[Object]>
+  - `page` <[Page]> Capture video of this page. Only supports Chromium for now.
+  - `savePath` <[string]> Where to save the video.
+- returns: <[Promise]<PageVideoCapture>>
+
+Captures video of a page.
+
+```js
+await capturePage({ page, savePath: '/tmp/video.mp4' });
+```
+
+### class: PageVideoCapture
+
+A `PageVideoCapture` is created when you call `capturePage`. It manages capturing the video of your page and saving it.
+
+### pageVideoCapture.stop()
+
+- returns <[Promise]>
+
+Stop the video capture if needed and save the video. The returned `Promise` resolves when the video is saved.
+
+The video capture will be stopped automatically if you close the page, so you should not need to call this unless you want to explicitly wait until the video is saved.
+
+```js
+const capture = await capturePage({ page, savePath: '/tmp/video.mp4' });
+await capture.stop();
+```
+
+[object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object 'Object'
+[page]: https://github.com/microsoft/playwright/blob/master/docs/api.md#class-page 'Page'
+[promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise 'Promise'
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type 'string'
