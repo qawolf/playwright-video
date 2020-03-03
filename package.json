@@ -19,7 +19,7 @@
     "build:watch": "tsc -w -p tsconfig.release.json",
     "lint": "eslint . --ext .ts,.tsx",
     "release": "np --no-cleanup",
-    "test": "jest --coverage",
+    "test": "jest",
     "test:watch": "jest --watch",
     "version": "npm run clean && npm run build"
   },
@@ -30,6 +30,7 @@
     "debug": "^4.1.1",
     "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^8.1.0",
+    "playwright-utils": "^0.3.0",
     "tslib": "^1.11.1"
   },
   "devDependencies": {
@@ -46,7 +47,7 @@
     "ffmpeg-static": "^4.0.1",
     "jest": "~25.1.0",
     "np": "^6.2.0",
-    "playwright": "next",
+    "playwright": "0.11.1-next.1583216591380",
     "prettier": "~1.19.1",
     "rimraf": "~3.0.2",
     "ts-jest": "^25.2.1",
