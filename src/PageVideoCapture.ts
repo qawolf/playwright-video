@@ -1,6 +1,5 @@
 import Debug from 'debug';
 import { Page } from 'playwright-core';
-import { CRBrowser } from 'playwright-core/lib/chromium/crBrowser';
 import { ScreencastFrameCollector } from './ScreencastFrameCollector';
 import { VideoFrameBuilder } from './VideoFrameBuilder';
 import { VideoWriter } from './VideoWriter';
@@ -14,20 +13,18 @@ interface ConstructorArgs {
 }
 
 interface CreateArgs {
-  browser: CRBrowser;
   page: Page;
   savePath: string;
 }
 
 export class PageVideoCapture {
   public static async start({
-    browser,
     page,
     savePath,
   }: CreateArgs): Promise<PageVideoCapture> {
     debug('start');
 
-    const collector = await ScreencastFrameCollector.create({ browser, page });
+    const collector = await ScreencastFrameCollector.create(page);
     const writer = await VideoWriter.create(savePath);
 
     const capture = new PageVideoCapture({ collector, page, writer });

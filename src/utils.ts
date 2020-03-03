@@ -1,5 +1,6 @@
 import { setFfmpegPath as setFluentFfmpegPath } from 'fluent-ffmpeg';
-import { CRBrowser } from 'playwright-core/lib/chromium/crBrowser';
+import { Page } from 'playwright-core';
+import { CRBrowserContext } from 'playwright-core/lib/chromium/crBrowser';
 
 export const getFfmpegFromModule = (): string | null => {
   try {
@@ -18,14 +19,6 @@ export const getFfmpegPath = (): string | null => {
   return getFfmpegFromModule();
 };
 
-export const ensureBrowserType = (browser: CRBrowser): void => {
-  if (!(browser instanceof CRBrowser)) {
-    throw new Error(
-      'playwright-video: browser must be a ChromiumBrowser instance',
-    );
-  }
-};
-
 export const ensureFfmpegPath = (): void => {
   const ffmpegPath = getFfmpegPath();
   if (!ffmpegPath) {
@@ -35,4 +28,14 @@ export const ensureFfmpegPath = (): void => {
   }
 
   setFluentFfmpegPath(ffmpegPath);
+};
+
+export const ensurePageType = (page: Page): void => {
+  const context = page.context();
+
+  if (!(context instanceof CRBrowserContext)) {
+    throw new Error(
+      'playwright-video: page context must be a CRBrowserContext instance',
+    );
+  }
 };

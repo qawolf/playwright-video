@@ -34,7 +34,6 @@ const { PageVideoCapture } = require('playwright-video');
   const page = await context.newPage();
 
   await PageVideoCapture.start({
-    browser,
     page,
     savePath: '/tmp/video.mp4',
   });

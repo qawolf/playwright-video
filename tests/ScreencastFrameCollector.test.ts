@@ -1,4 +1,4 @@
-import { chromium, firefox } from 'playwright-core';
+import { chromium, firefox } from 'playwright';
 import { CRBrowser } from 'playwright-core/lib/chromium/crBrowser';
 import { ScreencastFrameCollector } from '../src/ScreencastFrameCollector';
 
@@ -14,7 +14,7 @@ describe('ScreencastFrameCollector', () => {
   it('emits screencast frames of a page', async () => {
     const page = await browser.newPage();
 
-    const collector = await ScreencastFrameCollector.create({ browser, page });
+    const collector = await ScreencastFrameCollector.create(page);
     await collector.start();
 
     await new Promise(resolve => {
@@ -27,19 +27,16 @@ describe('ScreencastFrameCollector', () => {
     await page.close();
   });
 
-  it('throws an error if browser not a ChromiumBrowser instance', async () => {
+  it('throws an error if page context not a ChromiumBrowserContext instance', async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const firefoxBrowser = (await firefox.launch()) as any;
     const page = await firefoxBrowser.newPage();
 
     const testFn = (): Promise<ScreencastFrameCollector> =>
-      ScreencastFrameCollector.create({
-        browser: firefoxBrowser,
-        page,
-      });
+      ScreencastFrameCollector.create(page);
 
     await expect(testFn()).rejects.toThrow(
-      'browser must be a ChromiumBrowser instance',
+      'must be a CRBrowserContext instance',
     );
 
     await firefoxBrowser.close();
@@ -48,7 +45,7 @@ describe('ScreencastFrameCollector', () => {
   it('disposes the CDP session when stopped', async () => {
     const page = await browser.newPage();
 
-    const collector = await ScreencastFrameCollector.create({ browser, page });
+    const collector = await ScreencastFrameCollector.create(page);
     expect(collector._client._connection).toBeTruthy();
 
     await collector.stop();
