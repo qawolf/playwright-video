@@ -20,7 +20,7 @@ npm i playwright playwright-video
 
 ```js
 const { chromium, devices } = require('playwright');
-const { PageVideoCapture } = require('playwright-video');
+const { capturePage } = require('playwright-video');
 
 (async () => {
   const iPhone = devices['iPhone 6'];
@@ -33,10 +33,7 @@ const { PageVideoCapture } = require('playwright-video');
 
   const page = await context.newPage();
 
-  await PageVideoCapture.start({
-    page,
-    savePath: '/tmp/video.mp4',
-  });
+  await capturePage({ page, savePath: '/tmp/video.mp4' });
 
   await page.goto('http://example.org');
 
