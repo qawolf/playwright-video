@@ -1,7 +1,7 @@
 import { pathExists } from 'fs-extra';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import { chromium } from 'playwright-core';
+import { chromium } from 'playwright';
 import { CRBrowser } from 'playwright-core/lib/chromium/crBrowser';
 import { PageVideoCapture } from '../src/PageVideoCapture';
 
@@ -20,7 +20,7 @@ describe('PageVideoCapture', () => {
     const page = await browser.newPage();
     const savePath = buildSavePath();
 
-    const capture = await PageVideoCapture.start({ browser, page, savePath });
+    const capture = await PageVideoCapture.start({ page, savePath });
 
     await capture.stop();
 
@@ -34,7 +34,6 @@ describe('PageVideoCapture', () => {
     const page = await browser.newPage();
 
     const capture = await PageVideoCapture.start({
-      browser,
       page,
       savePath: buildSavePath(),
     });

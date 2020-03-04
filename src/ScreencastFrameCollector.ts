@@ -1,26 +1,18 @@
 import Debug from 'debug';
 import { EventEmitter } from 'events';
-import { Page } from 'playwright-core';
-import { CRBrowser } from 'playwright-core/lib/chromium/crBrowser';
+import { ChromiumBrowserContext, Page } from 'playwright-core';
 import { CRSession } from 'playwright-core/lib/chromium/crConnection';
-import { ensureBrowserType } from './utils';
+import { ensurePageType } from './utils';
 
 const debug = Debug('playwright-video:FrameCollector');
 
-interface ConstructorArgs {
-  browser: CRBrowser;
-  page: Page;
-}
-
 export class ScreencastFrameCollector extends EventEmitter {
-  public static async create(
-    args: ConstructorArgs,
-  ): Promise<ScreencastFrameCollector> {
-    ensureBrowserType(args.browser);
+  public static async create(page: Page): Promise<ScreencastFrameCollector> {
+    ensurePageType(page);
 
-    const collector = new ScreencastFrameCollector(args);
+    const collector = new ScreencastFrameCollector(page);
 
-    await collector._buildClient(args.browser);
+    await collector._buildClient();
     collector._listenForFrames();
 
     return collector;
@@ -31,13 +23,14 @@ export class ScreencastFrameCollector extends EventEmitter {
   private _page: Page;
   private _stopped = false;
 
-  protected constructor({ page }: ConstructorArgs) {
+  protected constructor(page: Page) {
     super();
     this._page = page;
   }
 
-  private async _buildClient(browser: CRBrowser): Promise<void> {
-    this._client = await browser.pageTarget(this._page).createCDPSession();
+  private async _buildClient(): Promise<void> {
+    const context = this._page.context() as ChromiumBrowserContext;
+    this._client = await context.createSession(this._page);
   }
 
   private _listenForFrames(): void {
