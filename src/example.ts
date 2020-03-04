@@ -12,7 +12,7 @@ import { saveVideo } from './saveVideo';
 
   const page = await context.newPage();
 
-  await saveVideo({ page, savePath: '/tmp/video.mp4' });
+  await saveVideo(page, '/tmp/video.mp4');
 
   await page.goto('http://example.org');
 

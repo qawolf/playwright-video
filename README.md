@@ -33,7 +33,7 @@ const { saveVideo } = require('playwright-video');
 
   const page = await context.newPage();
 
-  await saveVideo({ page, savePath: '/tmp/video.mp4' });
+  await saveVideo(page, '/tmp/video.mp4');
 
   await page.goto('http://example.org');
 
@@ -50,17 +50,16 @@ The video will be saved at the specified `savePath` (`/tmp/video.mp4` in the abo
 
 ## API
 
-#### playwright-video.saveVideo([options])
+#### playwright-video.saveVideo(page, savePath)
 
-- `options` <[Object]>
-  - `page` <[Page]> Save a video of this page. Only supports Chromium for now.
-  - `savePath` <[string]> Where to save the video.
+- `page` <[Page]> Save a video of this page. Only supports Chromium for now.
+- `savePath` <[string]> Where to save the video.
 - returns: <[Promise]<PageVideoCapture>>
 
 Records video of a page and saves it at the specified path.
 
 ```js
-await saveVideo({ page, savePath: '/tmp/video.mp4' });
+await saveVideo(page, '/tmp/video.mp4');
 ```
 
 ### class: PageVideoCapture
@@ -76,7 +75,7 @@ Stop the video capture if needed and save the video. The returned `Promise` reso
 The video capture will be stopped automatically if you close the page, so you should not need to call this unless you want to explicitly wait until the video is saved.
 
 ```js
-const capture = await saveVideo({ page, savePath: '/tmp/video.mp4' });
+const capture = await saveVideo(page, '/tmp/video.mp4');
 await capture.stop();
 ```
 

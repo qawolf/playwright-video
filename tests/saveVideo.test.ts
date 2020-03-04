@@ -19,7 +19,7 @@ describe('saveVideo', () => {
     const page = await context.newPage();
     const savePath = join(tmpdir(), `${Date.now()}.mp4`);
 
-    const capture = await saveVideo({ page, savePath });
+    const capture = await saveVideo(page, savePath);
 
     await capture.stop();
 
