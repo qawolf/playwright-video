@@ -13,7 +13,7 @@ npm i playwright playwright-video ffmpeg-static
 If you already have [FFmpeg](https://www.ffmpeg.org) installed, you can skip the `ffmpeg-static` installation by setting the `FFMPEG_PATH` environment variable.
 
 ```sh
-npm i playwright playwright-video
+npm i playwright@next playwright-video
 ```
 
 ## Use
