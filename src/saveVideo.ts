@@ -1,14 +1,14 @@
 import { Page } from 'playwright-core';
 import { PageVideoCapture } from './PageVideoCapture';
 
-interface CapturePageArgs {
+interface SaveVideoArgs {
   page: Page;
   savePath: string;
 }
 
-export const capturePage = ({
+export const saveVideo = ({
   page,
   savePath,
-}: CapturePageArgs): Promise<PageVideoCapture> => {
+}: SaveVideoArgs): Promise<PageVideoCapture> => {
   return PageVideoCapture.start({ page, savePath });
 };

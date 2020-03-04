@@ -3,9 +3,9 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { chromium } from 'playwright';
 import { CRBrowser } from 'playwright-core/lib/chromium/crBrowser';
-import { capturePage } from '../src/capturePage';
+import { saveVideo } from '../src/saveVideo';
 
-describe('capturePage', () => {
+describe('saveVideo', () => {
   let browser: CRBrowser;
 
   beforeAll(async () => {
@@ -19,7 +19,7 @@ describe('capturePage', () => {
     const page = await context.newPage();
     const savePath = join(tmpdir(), `${Date.now()}.mp4`);
 
-    const capture = await capturePage({ page, savePath });
+    const capture = await saveVideo({ page, savePath });
 
     await capture.stop();
 

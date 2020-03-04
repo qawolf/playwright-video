@@ -20,7 +20,7 @@ npm i playwright playwright-video
 
 ```js
 const { chromium, devices } = require('playwright');
-const { capturePage } = require('playwright-video');
+const { saveVideo } = require('playwright-video');
 
 (async () => {
   const iPhone = devices['iPhone 6'];
@@ -33,7 +33,7 @@ const { capturePage } = require('playwright-video');
 
   const page = await context.newPage();
 
-  await capturePage({ page, savePath: '/tmp/video.mp4' });
+  await saveVideo({ page, savePath: '/tmp/video.mp4' });
 
   await page.goto('http://example.org');
 
@@ -50,22 +50,22 @@ The video will be saved at the specified `savePath` (`/tmp/video.mp4` in the abo
 
 ## API
 
-#### playwright-video.capturePage([options])
+#### playwright-video.saveVideo([options])
 
 - `options` <[Object]>
-  - `page` <[Page]> Capture video of this page. Only supports Chromium for now.
+  - `page` <[Page]> Save a video of this page. Only supports Chromium for now.
   - `savePath` <[string]> Where to save the video.
 - returns: <[Promise]<PageVideoCapture>>
 
-Captures video of a page.
+Records video of a page and saves it at the specified path.
 
 ```js
-await capturePage({ page, savePath: '/tmp/video.mp4' });
+await saveVideo({ page, savePath: '/tmp/video.mp4' });
 ```
 
 ### class: PageVideoCapture
 
-A `PageVideoCapture` is created when you call `capturePage`. It manages capturing the video of your page and saving it.
+A `PageVideoCapture` is created when you call `saveVideo`. It manages capturing the video of your page and saving it.
 
 ### pageVideoCapture.stop()
 
@@ -76,7 +76,7 @@ Stop the video capture if needed and save the video. The returned `Promise` reso
 The video capture will be stopped automatically if you close the page, so you should not need to call this unless you want to explicitly wait until the video is saved.
 
 ```js
-const capture = await capturePage({ page, savePath: '/tmp/video.mp4' });
+const capture = await saveVideo({ page, savePath: '/tmp/video.mp4' });
 await capture.stop();
 ```
 
