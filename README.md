@@ -54,7 +54,7 @@ The video will be saved at the specified `savePath` (`/tmp/video.mp4` in the abo
 
 - `page` <[Page]> Save a video of this page. Only supports Chromium for now.
 - `savePath` <[string]> Where to save the video.
-- returns: <[Promise]\<PageVideoCapture>>
+- returns: <[Promise]<[PageVideoCapture](#class-pagevideocapture)>>
 
 Records video of a page and saves it at the specified path.
 
