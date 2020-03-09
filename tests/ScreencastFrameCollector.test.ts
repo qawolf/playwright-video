@@ -27,7 +27,7 @@ describe('ScreencastFrameCollector', () => {
     await page.close();
   });
 
-  it('throws an error if page context not a ChromiumBrowserContext instance', async () => {
+  it('throws an error if page context not chromium', async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const firefoxBrowser = (await firefox.launch()) as any;
     const page = await firefoxBrowser.newPage();
@@ -36,7 +36,7 @@ describe('ScreencastFrameCollector', () => {
       ScreencastFrameCollector.create(page);
 
     await expect(testFn()).rejects.toThrow(
-      'must be a CRBrowserContext instance',
+      'playwright-video: page context must be chromium',
     );
 
     await firefoxBrowser.close();

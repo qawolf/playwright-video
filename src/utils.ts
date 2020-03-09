@@ -33,9 +33,7 @@ export const ensureFfmpegPath = (): void => {
 export const ensurePageType = (page: Page): void => {
   const context = page.context();
 
-  if (!(context instanceof CRBrowserContext)) {
-    throw new Error(
-      'playwright-video: page context must be a CRBrowserContext instance',
-    );
+  if (!(context as CRBrowserContext).createSession) {
+    throw new Error('playwright-video: page context must be chromium');
   }
 };

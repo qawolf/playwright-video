@@ -43,8 +43,8 @@ export class PageVideoCapture {
     this._collector = collector;
     this._writer = writer;
 
-    this._writer.on('ffmpegerror', () => {
-      debug('stop due to ffmpeg error');
+    this._writer.on('ffmpegerror', error => {
+      debug(`stop due to ffmpeg error "${error.trim()}"`);
       this.stop();
     });
     page.on('close', () => this.stop());
