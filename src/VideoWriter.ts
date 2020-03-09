@@ -38,7 +38,8 @@ export class VideoWriter extends EventEmitter {
         .inputFPS(this._framesPerSecond)
         .outputOptions('-preset ultrafast')
         .on('error', e => {
-          this.emit('ffmpegerror');
+          this.emit('ffmpegerror', e.message);
+
           // do not reject as a result of not having frames
           if (
             !this._receivedFrame &&

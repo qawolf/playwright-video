@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Unit Tests
 
 on: [push]
 
@@ -7,18 +7,40 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
-        node-version: [10.x]
+        node-version: [12.x]
+        test: [lint, chromium]
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install chromium dependencies
+        if: matrix.test == 'chromium'
+        run: sudo apt-get install libgbm1
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install chromium dependencies
-        run: sudo apt-get install libgbm1
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - run: npm install
+
       - run: npm run lint
+        if: matrix.test == 'lint'
+
       - run: npm run build
+
       - run: npm test
+        if: matrix.test != 'lint'
+        env:
+          CI: true
+
+    timeout-minutes: 20
