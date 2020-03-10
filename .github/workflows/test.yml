@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [12.x]
+        node-version: [10.x]
         test: [lint, chromium]
 
     steps:
