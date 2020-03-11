@@ -74,8 +74,12 @@ export class ScreencastFrameCollector extends EventEmitter {
     if (this._stopped) return;
 
     debug('stopping');
-
     this._stopped = true;
+
+    // Screencast API takes time to send frames
+    // Wait 1s for frames to arrive
+    // TODO figure out a better pattern for this
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     if (this._client._connection) {
       debug('detaching client');
