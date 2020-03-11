@@ -53,10 +53,10 @@ export class ScreencastFrameCollector extends EventEmitter {
       });
 
       try {
-        // capture error so it does not propagate to the use
+        // capture error so it does not propagate to the user
+        // most likely it is due to the page closing
         await ackPromise;
       } catch (e) {
-        // nothing we can do
         debug('error sending screencastFrameAck %j', e.message);
       }
     });
