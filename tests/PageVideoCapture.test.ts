@@ -21,7 +21,7 @@ describe('PageVideoCapture', () => {
     const savePath = buildSavePath();
 
     const capture = await PageVideoCapture.start({ page, savePath });
-
+    await page.setContent('<html>hello world</html>');
     await capture.stop();
 
     const videoPathExists = await pathExists(savePath);
