@@ -1,5 +1,7 @@
 # playwright-video
 
+[![npm version](https://badge.fury.io/js/playwright-video.svg)](https://badge.fury.io/js/playwright-video) ![Unit Tests](https://github.com/qawolf/playwright-video/workflows/Unit%20Tests/badge.svg)
+
 🎬 Save a video recording of a [Playwright](https://github.com/microsoft/playwright) page (Chromium only for now)
 
 When Playwright adds support for the Screencast API in Firefox and WebKit, this will be updated to support these browsers.
