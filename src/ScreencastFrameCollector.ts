@@ -30,7 +30,7 @@ export class ScreencastFrameCollector extends EventEmitter {
 
   private async _buildClient(): Promise<void> {
     const context = this._page.context() as ChromiumBrowserContext;
-    this._client = await context.createSession(this._page);
+    this._client = await context.newCDPSession(this._page);
   }
 
   private _listenForFrames(): void {
