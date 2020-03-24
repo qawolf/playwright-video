@@ -1,14 +1,13 @@
 import { pathExists } from 'fs-extra';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import { chromium } from 'playwright';
-import { CRBrowser } from 'playwright-core/lib/chromium/crBrowser';
+import { chromium, ChromiumBrowser } from 'playwright';
 import { PageVideoCapture } from '../src/PageVideoCapture';
 
 const buildSavePath = (): string => join(tmpdir(), `${Date.now()}.mp4`);
 
 describe('PageVideoCapture', () => {
-  let browser: CRBrowser;
+  let browser: ChromiumBrowser;
 
   beforeAll(async () => {
     browser = await chromium.launch();

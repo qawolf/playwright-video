@@ -1,9 +1,8 @@
-import { chromium, firefox } from 'playwright';
-import { CRBrowser } from 'playwright-core/lib/chromium/crBrowser';
+import { chromium, ChromiumBrowser, firefox } from 'playwright';
 import { ScreencastFrameCollector } from '../src/ScreencastFrameCollector';
 
 describe('ScreencastFrameCollector', () => {
-  let browser: CRBrowser;
+  let browser: ChromiumBrowser;
 
   beforeAll(async () => {
     browser = await chromium.launch();
@@ -17,8 +16,8 @@ describe('ScreencastFrameCollector', () => {
     const collector = await ScreencastFrameCollector.create(page);
     await collector.start();
 
-    await new Promise(resolve => {
-      collector.on('screencastframe', payload => {
+    await new Promise((resolve) => {
+      collector.on('screencastframe', (payload) => {
         expect(payload.received).toBeTruthy();
         resolve();
       });
@@ -46,10 +45,13 @@ describe('ScreencastFrameCollector', () => {
     const page = await browser.newPage();
 
     const collector = await ScreencastFrameCollector.create(page);
-    expect(collector._client._connection).toBeTruthy();
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const client = collector._client as any;
+
+    expect(client._connection).toBeTruthy();
     await collector.stop();
-    expect(collector._client._connection).toBeNull();
+    expect(client._connection).toBeNull();
 
     await page.close();
   });
