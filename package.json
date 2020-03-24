@@ -31,12 +31,12 @@
     "url": "https://github.com/qawolf/playwright-video/issues"
   },
   "peerDependencies": {
-    "playwright-core": "*"
+    "playwright-core": "~0.12.1"
   },
   "dependencies": {
     "debug": "*",
     "fluent-ffmpeg": "^2.1.2",
-    "fs-extra": "^8.1.0",
+    "fs-extra": "^9.0.0",
     "tslib": "^1.11.1"
   },
   "devDependencies": {
@@ -44,17 +44,17 @@
     "@types/fluent-ffmpeg": "^2.1.14",
     "@types/fs-extra": "^8.1.0",
     "@types/jest": "^25.1.4",
-    "@types/node": "^13.9.2",
-    "@typescript-eslint/eslint-plugin": "~2.24.0",
-    "@typescript-eslint/parser": "~2.24.0",
+    "@types/node": "^13.9.3",
+    "@typescript-eslint/eslint-plugin": "~2.25.0",
+    "@typescript-eslint/parser": "~2.25.0",
     "eslint": "~6.8.0",
-    "eslint-config-prettier": "~6.10.0",
+    "eslint-config-prettier": "~6.10.1",
     "eslint-plugin-jest": "~23.8.2",
     "ffmpeg-static": "^4.0.1",
     "jest": "~25.1.0",
     "np": "^6.2.0",
-    "playwright": "0.11.1-next.1584577781703",
-    "prettier": "~1.19.1",
+    "playwright": "0.12.1",
+    "prettier": "~2.0.2",
     "rimraf": "~3.0.2",
     "ts-jest": "^25.2.1",
     "tsutils": "~3.17.1",

@@ -1,7 +1,6 @@
 import Debug from 'debug';
 import { EventEmitter } from 'events';
-import { ChromiumBrowserContext, Page } from 'playwright-core';
-import { CRSession } from 'playwright-core/lib/chromium/crConnection';
+import { CDPSession, ChromiumBrowserContext, Page } from 'playwright-core';
 import { ensurePageType } from './utils';
 
 const debug = Debug('playwright-video:ScreencastFrameCollector');
@@ -19,7 +18,7 @@ export class ScreencastFrameCollector extends EventEmitter {
   }
 
   // public for tests
-  public _client: CRSession;
+  public _client: CDPSession;
   private _page: Page;
   private _stopped = false;
 
@@ -34,7 +33,7 @@ export class ScreencastFrameCollector extends EventEmitter {
   }
 
   private _listenForFrames(): void {
-    this._client.on('Page.screencastFrame', async payload => {
+    this._client.on('Page.screencastFrame', async (payload) => {
       debug(`received frame with timestamp ${payload.metadata.timestamp}`);
 
       const ackPromise = this._client.send('Page.screencastFrameAck', {
@@ -79,12 +78,13 @@ export class ScreencastFrameCollector extends EventEmitter {
     // Screencast API takes time to send frames
     // Wait 1s for frames to arrive
     // TODO figure out a better pattern for this
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    if (this._client._connection) {
+    try {
       debug('detaching client');
       await this._client.detach();
-      debug('client detached');
+    } catch (e) {
+      debug('error detaching client', e.message);
     }
 
     debug('stopped');

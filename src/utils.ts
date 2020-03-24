@@ -1,6 +1,5 @@
 import { setFfmpegPath as setFluentFfmpegPath } from 'fluent-ffmpeg';
-import { Page } from 'playwright-core';
-import { CRBrowserContext } from 'playwright-core/lib/chromium/crBrowser';
+import { ChromiumBrowserContext, Page } from 'playwright-core';
 
 export const getFfmpegFromModule = (): string | null => {
   try {
@@ -33,7 +32,7 @@ export const ensureFfmpegPath = (): void => {
 export const ensurePageType = (page: Page): void => {
   const context = page.context();
 
-  if (!(context as CRBrowserContext).newCDPSession) {
+  if (!(context as ChromiumBrowserContext).newCDPSession) {
     throw new Error('playwright-video: page context must be chromium');
   }
 };
