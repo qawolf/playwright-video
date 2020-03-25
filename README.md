@@ -21,17 +21,13 @@ npm i playwright@next playwright-video
 ## Use
 
 ```js
-const { chromium, devices } = require('playwright');
+const { chromium } = require('playwright');
 const { saveVideo } = require('playwright-video');
 
 (async () => {
-  const iPhone = devices['iPhone 6'];
-
   const browser = await chromium.launch();
-  const context = await browser.newContext({
-    viewport: iPhone.viewport,
-    userAgent: iPhone.userAgent,
-  });
+
+  const context = await browser.newContext();
 
   const page = await context.newPage();
 
@@ -39,10 +35,7 @@ const { saveVideo } = require('playwright-video');
 
   await page.goto('http://example.org');
 
-  await Promise.all([
-    page.waitForNavigation({ waitUntil: 'networkidle0' }),
-    page.click('a'),
-  ]);
+  await page.click('a');
 
   await browser.close();
 })();
