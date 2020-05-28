@@ -2,7 +2,7 @@ import Debug from 'debug';
 
 const debug = Debug('playwright-video:VideoFrameBuilder');
 
-interface ScreencastFrame {
+export interface ScreencastFrame {
   data: Buffer;
   received: number;
   timestamp: number;
