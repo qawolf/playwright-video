@@ -30,11 +30,4 @@ describe('VideoFrameBuilder', () => {
       Array(25).fill(buffer),
     );
   });
-
-  it('returns empty array if frames out of order', () => {
-    const frameBuilder = new VideoFrameBuilder();
-    frameBuilder.buildVideoFrames(screencastFrame2);
-
-    expect(frameBuilder.buildVideoFrames(screencastFrame)).toEqual([]);
-  });
 });
