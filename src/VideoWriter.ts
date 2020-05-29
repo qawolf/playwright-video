@@ -72,7 +72,10 @@ export class VideoWriter extends EventEmitter {
   public write(data: Buffer, durationSeconds = 1): void {
     this._receivedFrame = true;
 
-    const numFrames = Math.round(durationSeconds * this._framesPerSecond);
+    const numFrames = Math.max(
+      Math.round(durationSeconds * this._framesPerSecond),
+      1,
+    );
     debug(`write ${numFrames} frames for duration ${durationSeconds}s`);
 
     for (let i = 0; i < numFrames; i++) {
