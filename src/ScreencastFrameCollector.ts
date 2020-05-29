@@ -26,7 +26,7 @@ export class ScreencastFrameCollector extends EventEmitter {
   // public for tests
   public _client: CDPSession;
   private _page: Page;
-  private _stopped = false;
+  private _stoppedTimestamp;
 
   protected constructor(page: Page) {
     super();
@@ -75,11 +75,15 @@ export class ScreencastFrameCollector extends EventEmitter {
     });
   }
 
-  public async stop(): Promise<void> {
-    if (this._stopped) return;
+  public async stop(): Promise<number> {
+    if (this._stoppedTimestamp) {
+      throw new Error(
+        'pw-video: Cannot call stop twice on the same capture.',
+      );
+    }
 
-    debug('stopping');
-    this._stopped = true;
+    this._stoppedTimestamp = Date.now() / 1000;
+    debug(`stopping screencast at ${this._stoppedTimestamp}`);
 
     // Screencast API takes time to send frames
     // Wait 1s for frames to arrive
@@ -94,5 +98,7 @@ export class ScreencastFrameCollector extends EventEmitter {
     }
 
     debug('stopped');
+
+    return this._stoppedTimestamp;
   }
 }

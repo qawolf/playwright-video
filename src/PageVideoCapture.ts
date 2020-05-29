@@ -83,13 +83,12 @@ export class PageVideoCapture {
     this._previousFrame = currentFrame;
   }
 
-  private _writeFinalFrame(): void {
+  private _writeFinalFrameUpToTimestamp(stoppedTimestamp: number): void {
     if (!this._previousFrame) return;
 
-    // write the final frame based on the duration between it and now
+    // write the final frame based on the duration between it and when the screencast was stopped
     debug('write final frame');
-    const durationSeconds =
-      (Date.now() - this._previousFrame.timestamp * 1000) / 1000;
+    const durationSeconds = stoppedTimestamp - this._previousFrame.timestamp;
     this._writer.write(this._previousFrame.data, durationSeconds);
   }
 
@@ -99,9 +98,9 @@ export class PageVideoCapture {
     debug('stop');
     this._stopped = true;
 
-    await this._collector.stop();
+    const stoppedTimestamp = await this._collector.stop();
     this._queue.drain();
-    this._writeFinalFrame();
+    this._writeFinalFrameUpToTimestamp(stoppedTimestamp);
 
     return this._writer.stop();
   }
