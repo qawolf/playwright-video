@@ -7,7 +7,7 @@ import {
 } from './ScreencastFrameCollector';
 import { VideoWriter } from './VideoWriter';
 
-const debug = Debug('playwright-video:PageVideoCapture');
+const debug = Debug('pw-video:PageVideoCapture');
 
 interface ConstructorArgs {
   collector: ScreencastFrameCollector;

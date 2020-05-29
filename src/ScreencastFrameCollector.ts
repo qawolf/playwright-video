@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import { CDPSession, ChromiumBrowserContext, Page } from 'playwright-core';
 import { ensurePageType } from './utils';
 
-const debug = Debug('playwright-video:ScreencastFrameCollector');
+const debug = Debug('pw-video:ScreencastFrameCollector');
 
 export interface ScreencastFrame {
   data: Buffer;

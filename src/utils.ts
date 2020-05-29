@@ -22,7 +22,7 @@ export const ensureFfmpegPath = (): void => {
   const ffmpegPath = getFfmpegPath();
   if (!ffmpegPath) {
     throw new Error(
-      'playwright-video: FFmpeg path not set. Set the FFMPEG_PATH env variable or install ffmpeg-static as a dependency.',
+      'pw-video: FFmpeg path not set. Set the FFMPEG_PATH env variable or install ffmpeg-static as a dependency.',
     );
   }
 
@@ -33,6 +33,6 @@ export const ensurePageType = (page: Page): void => {
   const context = page.context();
 
   if (!(context as ChromiumBrowserContext).newCDPSession) {
-    throw new Error('playwright-video: page context must be chromium');
+    throw new Error('pw-video: page context must be chromium');
   }
 };

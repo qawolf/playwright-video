@@ -6,7 +6,7 @@ import { dirname } from 'path';
 import { PassThrough } from 'stream';
 import { ensureFfmpegPath } from './utils';
 
-const debug = Debug('playwright-video:VideoWriter');
+const debug = Debug('pw-video:VideoWriter');
 
 export class VideoWriter extends EventEmitter {
   public static async create(savePath: string): Promise<VideoWriter> {
@@ -49,7 +49,7 @@ export class VideoWriter extends EventEmitter {
             return;
           }
 
-          reject(`playwright-video: error capturing video: ${e.message}`);
+          reject(`pw-video: error capturing video: ${e.message}`);
         })
         .on('end', () => {
           resolve();

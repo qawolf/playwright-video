@@ -2,7 +2,7 @@ import Debug from 'debug';
 import { EventEmitter } from 'events';
 import { ScreencastFrame } from './ScreencastFrameCollector';
 
-const debug = Debug('playwright-video:SortedFrameQueue');
+const debug = Debug('pw-video:SortedFrameQueue');
 
 // Frames are sorted as they're inserted into the queue. This allows us
 // to preserve frames that are sent out of order from CDP instead of discarding them.
