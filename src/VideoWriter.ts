@@ -6,7 +6,7 @@ import { dirname } from 'path';
 import { PassThrough } from 'stream';
 import { ensureFfmpegPath } from './utils';
 
-const debug = Debug('playwright-video:VideoWriter');
+const debug = Debug('pw-video:VideoWriter');
 
 export class VideoWriter extends EventEmitter {
   public static async create(savePath: string): Promise<VideoWriter> {
@@ -37,7 +37,7 @@ export class VideoWriter extends EventEmitter {
         .inputFormat('image2pipe')
         .inputFPS(this._framesPerSecond)
         .outputOptions('-preset ultrafast')
-        .on('error', e => {
+        .on('error', (e) => {
           this.emit('ffmpegerror', e.message);
 
           // do not reject as a result of not having frames
@@ -49,7 +49,7 @@ export class VideoWriter extends EventEmitter {
             return;
           }
 
-          reject(`playwright-video: error capturing video: ${e.message}`);
+          reject(`pw-video: error capturing video: ${e.message}`);
         })
         .on('end', () => {
           resolve();
@@ -69,15 +69,14 @@ export class VideoWriter extends EventEmitter {
     return this._endedPromise;
   }
 
-  public write(frames: Buffer[]): void {
-    debug(`write ${frames.length} frames`);
+  public write(data: Buffer, durationSeconds = 1): void {
+    this._receivedFrame = true;
 
-    if (frames.length && !this._receivedFrame) {
-      this._receivedFrame = true;
+    const numFrames = Math.round(durationSeconds * this._framesPerSecond);
+    debug(`write ${numFrames} frames for duration ${durationSeconds}s`);
+
+    for (let i = 0; i < numFrames; i++) {
+      this._stream.write(data);
     }
-
-    frames.forEach(frame => {
-      this._stream.write(frame);
-    });
   }
 }

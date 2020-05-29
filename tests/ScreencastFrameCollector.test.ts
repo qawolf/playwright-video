@@ -35,7 +35,7 @@ describe('ScreencastFrameCollector', () => {
       ScreencastFrameCollector.create(page);
 
     await expect(testFn()).rejects.toThrow(
-      'playwright-video: page context must be chromium',
+      'pw-video: page context must be chromium',
     );
 
     await firefoxBrowser.close();
