@@ -76,7 +76,7 @@ export class PageVideoCapture {
     // write the previous frame based on the duration between it and the current frame
     if (this._previousFrame) {
       const durationSeconds =
-        (currentFrame.received - this._previousFrame.received) / 1000;
+        currentFrame.timestamp - this._previousFrame.timestamp;
       this._writer.write(this._previousFrame.data, durationSeconds);
     }
 
@@ -88,7 +88,8 @@ export class PageVideoCapture {
 
     // write the final frame based on the duration between it and now
     debug('write final frame');
-    const durationSeconds = (Date.now() - this._previousFrame.received) / 1000;
+    const durationSeconds =
+      (Date.now() - this._previousFrame.timestamp * 1000) / 1000;
     this._writer.write(this._previousFrame.data, durationSeconds);
   }
 
