@@ -2,7 +2,7 @@ import Debug from 'debug';
 
 const debug = Debug('playwright-video:VideoFrameBuilder');
 
-interface ScreencastFrame {
+export interface ScreencastFrame {
   data: Buffer;
   received: number;
   timestamp: number;
@@ -35,12 +35,6 @@ export class VideoFrameBuilder {
     }
 
     const frameCount = this._getFrameCount(screencastFrame);
-
-    if (frameCount < 0) {
-      debug('frames out of order: skipping frame');
-      return [];
-    }
-
     const frames = Array(frameCount).fill(this._previousFrame.data);
     debug(`returning ${frames.length} frames`);
 
