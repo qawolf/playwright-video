@@ -4,6 +4,11 @@ import { ScreencastFrame } from './VideoFrameBuilder';
 
 const debug = Debug('playwright-video:SortedFrameQueue');
 
+// Frames are sorted as they're inserted into the queue. This allows us
+// to preserve frames that are sent out of order from CDP instead of discarding them.
+// When the queue is full, half of the frames are emitted for processing.
+// When we're done working with the queue, we can drain the remaining frames.
+
 export class SortedFrameQueue extends EventEmitter {
   // public for tests
   public _frames = [];
@@ -43,8 +48,6 @@ export class SortedFrameQueue extends EventEmitter {
   }
 
   public insert(frame: ScreencastFrame): void {
-    debug(`inserting frame into queue: ${frame.timestamp}`);
-
     // If the queue is already full, send half of the frames for processing first
     if (this._frames.length === this._size) {
       const numberOfFramesToSplice = Math.floor(this._size / 2);
@@ -56,9 +59,11 @@ export class SortedFrameQueue extends EventEmitter {
     const insertionIndex = this._findInsertionIndex(frame.timestamp);
 
     if (insertionIndex === this._frames.length) {
+      debug(`inserting frame into queue at end: ${frame.timestamp}`);
       // If this frame is in order, push it
       this._frames.push(frame);
     } else {
+      debug(`inserting frame into queue at index ${insertionIndex}: ${frame.timestamp}`);
       // If this frame is out of order, splice it in
       this._frames.splice(insertionIndex, 0, frame);
     }
