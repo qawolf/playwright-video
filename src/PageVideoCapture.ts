@@ -1,8 +1,10 @@
 import Debug from 'debug';
 import { Page } from 'playwright-core';
 import { SortedFrameQueue } from './SortedFrameQueue';
-import { ScreencastFrameCollector } from './ScreencastFrameCollector';
-import { VideoFrameBuilder } from './VideoFrameBuilder';
+import {
+  ScreencastFrame,
+  ScreencastFrameCollector,
+} from './ScreencastFrameCollector';
 import { VideoWriter } from './VideoWriter';
 
 const debug = Debug('playwright-video:PageVideoCapture');
@@ -37,8 +39,8 @@ export class PageVideoCapture {
   }
 
   private _collector: ScreencastFrameCollector;
+  private _previousFrame?: ScreencastFrame;
   private _queue: SortedFrameQueue;
-  private _frameBuilder: VideoFrameBuilder = new VideoFrameBuilder();
   // public for tests
   public _stopped = false;
   private _writer: VideoWriter;
@@ -66,19 +68,28 @@ export class PageVideoCapture {
 
     this._queue.on('sortedframes', (frames) => {
       debug(`received ${frames.length} frames from queue`);
-
-      frames.forEach((frame) => {
-        const videoFrames = this._frameBuilder.buildVideoFrames(frame);
-        this._writer.write(videoFrames);
-      });
+      frames.forEach((frame) => this._writePreviousFrame(frame));
     });
   }
 
-  private _writeLastFrame(): void {
-    debug('write last frame');
+  private _writePreviousFrame(currentFrame: ScreencastFrame): void {
+    // write the previous frame based on the duration between it and the current frame
+    if (this._previousFrame) {
+      const durationSeconds =
+        (currentFrame.received - this._previousFrame.received) / 1000;
+      this._writer.write(this._previousFrame.data, durationSeconds);
+    }
 
-    const videoFrames = this._frameBuilder.buildVideoFrames();
-    this._writer.write(videoFrames);
+    this._previousFrame = currentFrame;
+  }
+
+  private _writeFinalFrame(): void {
+    if (!this._previousFrame) return;
+
+    // write the final frame based on the duration between it and now
+    debug('write final frame');
+    const durationSeconds = (Date.now() - this._previousFrame.received) / 1000;
+    this._writer.write(this._previousFrame.data, durationSeconds);
   }
 
   public async stop(): Promise<void> {
@@ -89,7 +100,7 @@ export class PageVideoCapture {
 
     await this._collector.stop();
     this._queue.drain();
-    this._writeLastFrame();
+    this._writeFinalFrame();
 
     return this._writer.stop();
   }

@@ -1,6 +1,6 @@
 import Debug from 'debug';
 import { EventEmitter } from 'events';
-import { ScreencastFrame } from './VideoFrameBuilder';
+import { ScreencastFrame } from './ScreencastFrameCollector';
 
 const debug = Debug('playwright-video:SortedFrameQueue');
 
@@ -63,7 +63,9 @@ export class SortedFrameQueue extends EventEmitter {
       // If this frame is in order, push it
       this._frames.push(frame);
     } else {
-      debug(`inserting frame into queue at index ${insertionIndex}: ${frame.timestamp}`);
+      debug(
+        `inserting frame into queue at index ${insertionIndex}: ${frame.timestamp}`,
+      );
       // If this frame is out of order, splice it in
       this._frames.splice(insertionIndex, 0, frame);
     }

@@ -5,6 +5,12 @@ import { ensurePageType } from './utils';
 
 const debug = Debug('playwright-video:ScreencastFrameCollector');
 
+export interface ScreencastFrame {
+  data: Buffer;
+  received: number;
+  timestamp: number;
+}
+
 export class ScreencastFrameCollector extends EventEmitter {
   public static async create(page: Page): Promise<ScreencastFrameCollector> {
     ensurePageType(page);
