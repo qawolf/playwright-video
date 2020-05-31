@@ -4,6 +4,8 @@ import { join } from 'path';
 import { chromium, ChromiumBrowser } from 'playwright';
 import { saveVideo } from '../src/saveVideo';
 
+jest.setTimeout(10 * 1000)
+
 describe('saveVideo', () => {
   let browser: ChromiumBrowser;
 

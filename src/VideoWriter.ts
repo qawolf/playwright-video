@@ -36,8 +36,9 @@ export class VideoWriter extends EventEmitter {
         .videoCodec('libx264')
         .inputFormat('image2pipe')
         .inputFPS(this._framesPerSecond)
-        .outputOptions(['-preset ultrafast', '-pix_fmt yuv420p', '-acodec libmp3lame'])
-        .on('error', e => {
+        .outputOptions('-preset ultrafast')
+        .outputOptions('-pix_fmt yuv420p')
+        .on('error', (e) => {
           this.emit('ffmpegerror', e.message);
 
           // do not reject as a result of not having frames

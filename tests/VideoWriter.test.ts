@@ -22,7 +22,7 @@ describe('VideoWriter', () => {
     writer.write([
       // White 1×1 PNG http://proger.i-forge.net/%D0%9A%D0%BE%D0%BC%D0%BF%D1%8C%D1%8E%D1%82%D0%B5%D1%80/[20121112]%20The%20smallest%20transparent%20pixel.html
       Buffer.from(
-        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVQYV2P4DwABAQEAWk1v8QAAAABJRU5ErkJggg==',
+        'iVBORw0KGgoAAAANSUhEUgAAAAYAAACiCAYAAABiQbywAAAAKklEQVRYhe3JMQEAAAjDMMC/52EAARzp2XSS1NFcEwAAAAAAAAAAAD9gARW/BUBIVRRtAAAAAElFTkSuQmCC',
         'base64',
       ),
     ]);
