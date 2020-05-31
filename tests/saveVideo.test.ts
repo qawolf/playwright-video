@@ -21,7 +21,12 @@ describe('saveVideo', () => {
     const savePath = join(tmpdir(), `${Date.now()}.mp4`);
 
     const capture = await saveVideo(page, savePath);
-    await page.setContent('<html>hello world</html>');
+
+    for (let i = 0; i < 10; i++) {
+      await page.setContent(`<html>hello world ${i}</html>`);
+      await new Promise((r) => setTimeout(r, 100));
+    }
+
     await capture.stop();
 
     const videoPathExists = await pathExists(savePath);
