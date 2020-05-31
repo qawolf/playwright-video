@@ -37,6 +37,7 @@ export class VideoWriter extends EventEmitter {
         .inputFormat('image2pipe')
         .inputFPS(this._framesPerSecond)
         .outputOptions('-preset ultrafast')
+        .outputOptions('-pix_fmt yuv420p')
         .on('error', (e) => {
           this.emit('ffmpegerror', e.message);
 
