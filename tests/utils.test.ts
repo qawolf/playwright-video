@@ -14,13 +14,13 @@ describe('getFfmpegPath', () => {
     process.env.FFMPEG_PATH = '';
   });
 
-  it('returns ffmpeg-static path if installed', () => {
+  it('returns @ffmpeg-installer/ffmpeg path if installed', () => {
     jest
       .spyOn(utils, 'getFfmpegFromModule')
-      .mockReturnValue('ffmpeg-static/path');
+      .mockReturnValue('@ffmpeg-installer/ffmpeg/path');
 
     const path = getFfmpegPath();
-    expect(path).toBe('ffmpeg-static/path');
+    expect(path).toBe('@ffmpeg-installer/ffmpeg/path');
   });
 
   it('returns null when no path is found', () => {

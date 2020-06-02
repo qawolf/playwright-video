@@ -9,10 +9,10 @@ When Playwright adds support for the Screencast API in Firefox and WebKit, this 
 ## Install
 
 ```sh
-npm i playwright playwright-video ffmpeg-static
+npm i playwright playwright-video @ffmpeg-installer/ffmpeg
 ```
 
-If you already have [FFmpeg](https://www.ffmpeg.org) installed, you can skip the `ffmpeg-static` installation by setting the `FFMPEG_PATH` environment variable.
+If you already have [FFmpeg](https://www.ffmpeg.org) installed, you can skip the `@ffmpeg-installer/ffmpeg` installation by setting the `FFMPEG_PATH` environment variable.
 
 ```sh
 npm i playwright playwright-video
