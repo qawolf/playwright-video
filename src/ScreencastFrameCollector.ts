@@ -26,7 +26,8 @@ export class ScreencastFrameCollector extends EventEmitter {
   // public for tests
   public _client: CDPSession;
   private _page: Page;
-  private _stopped = false;
+  private _stoppedTimestamp: number;
+  private _endedPromise: Promise<void>;
 
   protected constructor(page: Page) {
     super();
@@ -39,31 +40,39 @@ export class ScreencastFrameCollector extends EventEmitter {
   }
 
   private _listenForFrames(): void {
-    this._client.on('Page.screencastFrame', async (payload) => {
-      debug(`received frame with timestamp ${payload.metadata.timestamp}`);
+    this._endedPromise = new Promise((resolve) => {
+      this._client.on('Page.screencastFrame', async (payload) => {
+        if (!payload.metadata.timestamp) {
+          debug('skipping frame without timestamp');
+          return;
+        }
 
-      const ackPromise = this._client.send('Page.screencastFrameAck', {
-        sessionId: payload.sessionId,
+        if (this._stoppedTimestamp && payload.metadata.timestamp > this._stoppedTimestamp) {
+          debug('all frames received');
+          resolve();
+          return;
+        }
+
+        debug(`received frame with timestamp ${payload.metadata.timestamp}`);
+
+        const ackPromise = this._client.send('Page.screencastFrameAck', {
+          sessionId: payload.sessionId,
+        });
+
+        this.emit('screencastframe', {
+          data: Buffer.from(payload.data, 'base64'),
+          received: Date.now(),
+          timestamp: payload.metadata.timestamp,
+        });
+
+        try {
+          // capture error so it does not propagate to the user
+          // most likely it is due to the page closing
+          await ackPromise;
+        } catch (e) {
+          debug('error sending screencastFrameAck %j', e.message);
+        }
       });
-
-      if (!payload.metadata.timestamp) {
-        debug('skip frame without timestamp');
-        return;
-      }
-
-      this.emit('screencastframe', {
-        data: Buffer.from(payload.data, 'base64'),
-        received: Date.now(),
-        timestamp: payload.metadata.timestamp,
-      });
-
-      try {
-        // capture error so it does not propagate to the user
-        // most likely it is due to the page closing
-        await ackPromise;
-      } catch (e) {
-        debug('error sending screencastFrameAck %j', e.message);
-      }
     });
   }
 
@@ -75,16 +84,22 @@ export class ScreencastFrameCollector extends EventEmitter {
     });
   }
 
-  public async stop(): Promise<void> {
-    if (this._stopped) return;
+  public async stop(): Promise<number> {
+    if (this._stoppedTimestamp) {
+      throw new Error(
+        'pw-video: Cannot call stop twice on the same capture.',
+      );
+    }
 
-    debug('stopping');
-    this._stopped = true;
+    this._stoppedTimestamp = Date.now() / 1000;
+    debug(`stopping screencast at ${this._stoppedTimestamp}`);
 
-    // Screencast API takes time to send frames
-    // Wait 1s for frames to arrive
-    // TODO figure out a better pattern for this
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Make sure stopping takes no longer than 1s in cases when the screencast API
+    // doesn't emit frames all the way up to the stopped timestamp.
+    await Promise.race([
+      this._endedPromise,
+      new Promise((resolve) => setTimeout(resolve, 1000)),
+    ]);
 
     try {
       debug('detaching client');
@@ -94,5 +109,7 @@ export class ScreencastFrameCollector extends EventEmitter {
     }
 
     debug('stopped');
+
+    return this._stoppedTimestamp;
   }
 }
