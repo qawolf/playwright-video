@@ -93,7 +93,13 @@ export class ScreencastFrameCollector extends EventEmitter {
 
     this._stoppedTimestamp = Date.now() / 1000;
     debug(`stopping screencast at ${this._stoppedTimestamp}`);
-    await this._endedPromise;
+
+    // Make sure stopping takes no longer than 1s in cases when the screencast API
+    // doesn't emit frames all the way up to the stopped timestamp.
+    await Promise.race([
+      this._endedPromise,
+      new Promise((resolve) => setTimeout(resolve, 1000)),
+    ]);
 
     try {
       debug('detaching client');
