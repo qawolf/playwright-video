@@ -17,9 +17,6 @@ export class ScreencastFrameCollector extends EventEmitter {
 
     const collector = new ScreencastFrameCollector(page);
 
-    await collector._buildClient();
-    collector._listenForFrames();
-
     return collector;
   }
 
@@ -34,9 +31,9 @@ export class ScreencastFrameCollector extends EventEmitter {
     this._page = page;
   }
 
-  private async _buildClient(): Promise<void> {
-    const context = this._page.context() as ChromiumBrowserContext;
-    this._client = await context.newCDPSession(this._page);
+  private async _buildClient(page: Page): Promise<void> {
+    const context = page.context() as ChromiumBrowserContext;
+    this._client = await context.newCDPSession(page);
   }
 
   private _listenForFrames(): void {
@@ -76,12 +73,23 @@ export class ScreencastFrameCollector extends EventEmitter {
     });
   }
 
-  public async start(): Promise<void> {
-    debug('start');
+  private async _activatePage(page: Page): Promise<void> {
+    ensurePageType(page);
+
+    debug('activating page: ', page.url());
+
+    await this._buildClient(page);
+    this._listenForFrames();
 
     await this._client.send('Page.startScreencast', {
       everyNthFrame: 1,
     });
+  }
+
+  public async start(): Promise<void> {
+    debug('start');
+
+    await this._activatePage(this._page);
   }
 
   public async stop(): Promise<number> {
