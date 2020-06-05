@@ -8,7 +8,9 @@ describe('ScreencastFrameCollector', () => {
     browser = await chromium.launch();
   });
 
-  afterAll(() => browser.close());
+  afterAll(async () => {
+    await browser.close();
+  });
 
   it('emits screencast frames of a page', async () => {
     const page = await browser.newPage();

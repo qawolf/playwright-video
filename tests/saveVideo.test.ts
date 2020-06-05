@@ -13,7 +13,9 @@ describe('saveVideo', () => {
     browser = await chromium.launch();
   });
 
-  afterAll(() => browser.close());
+  afterAll(async () => {
+    await browser.close();
+  });
 
   it('captures a video of the page', async () => {
     const context = await browser.newContext();
