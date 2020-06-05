@@ -1,6 +1,7 @@
 import Debug from 'debug';
 import { EventEmitter } from 'events';
 import { CDPSession, ChromiumBrowserContext, Page } from 'playwright-core';
+import { CaptureOptions } from './PageVideoCapture';
 import { ensurePageType } from './utils';
 
 const debug = Debug('pw-video:ScreencastFrameCollector');
@@ -12,33 +13,67 @@ export interface ScreencastFrame {
 }
 
 export class ScreencastFrameCollector extends EventEmitter {
-  public static async create(page: Page): Promise<ScreencastFrameCollector> {
-    ensurePageType(page);
+  public static async create(originalPage: Page, options?: CaptureOptions): Promise<ScreencastFrameCollector> {
+    ensurePageType(originalPage);
 
-    const collector = new ScreencastFrameCollector(page);
+    const collector = new ScreencastFrameCollector(originalPage, options);
 
     return collector;
   }
 
   // public for tests
-  public _client: CDPSession;
-  private _page: Page;
+  public _clients: [CDPSession?];
+  private _originalPage: Page;
   private _stoppedTimestamp: number;
   private _endedPromise: Promise<void>;
+  // public for tests
+  public _followPopups: boolean;
 
-  protected constructor(page: Page) {
+  protected constructor(page: Page, options: CaptureOptions) {
     super();
-    this._page = page;
+    this._originalPage = page;
+    this._clients = [];
+    this._followPopups = options ? options.followPopups : false;
+
+    this._popupFollower = this._popupFollower.bind(this);
   }
 
-  private async _buildClient(page: Page): Promise<void> {
+  private async _popupFollower(popup: Page): Promise<void> {
+    await this._activatePage(popup);
+
+    // for tests
+    this.emit('popupFollowed');
+
+    popup.once('close', async () => {
+      await this._deactivatePage(popup);
+    });
+  }
+
+  private _installPopupFollower(page: Page): void {
+    page.on('popup', this._popupFollower);
+  }
+
+  private _uninstallPopupFollower(page: Page): void {
+    // Fixed in https://github.com/microsoft/playwright/pull/2307
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    page.off('popup', this._popupFollower);
+  }
+
+  private async _buildClient(page: Page): Promise<CDPSession> {
     const context = page.context() as ChromiumBrowserContext;
-    this._client = await context.newCDPSession(page);
+    const client = await context.newCDPSession(page);
+
+    return client;
   }
 
-  private _listenForFrames(): void {
+  private _getActiveClient(): CDPSession | null {
+    return this._clients[this._clients.length - 1];
+  }
+
+  private _listenForFrames(client: CDPSession): void {
     this._endedPromise = new Promise((resolve) => {
-      this._client.on('Page.screencastFrame', async (payload) => {
+      client.on('Page.screencastFrame', async (payload) => {
         if (!payload.metadata.timestamp) {
           debug('skipping frame without timestamp');
           return;
@@ -52,7 +87,7 @@ export class ScreencastFrameCollector extends EventEmitter {
 
         debug(`received frame with timestamp ${payload.metadata.timestamp}`);
 
-        const ackPromise = this._client.send('Page.screencastFrameAck', {
+        const ackPromise = client.send('Page.screencastFrameAck', {
           sessionId: payload.sessionId,
         });
 
@@ -64,7 +99,7 @@ export class ScreencastFrameCollector extends EventEmitter {
 
         try {
           // capture error so it does not propagate to the user
-          // most likely it is due to the page closing
+          // most likely it is due to the active page closing
           await ackPromise;
         } catch (e) {
           debug('error sending screencastFrameAck %j', e.message);
@@ -74,22 +109,48 @@ export class ScreencastFrameCollector extends EventEmitter {
   }
 
   private async _activatePage(page: Page): Promise<void> {
-    ensurePageType(page);
-
     debug('activating page: ', page.url());
 
-    await this._buildClient(page);
-    this._listenForFrames();
+    const previousClient = this._getActiveClient();
 
-    await this._client.send('Page.startScreencast', {
+    if (previousClient) {
+      await previousClient.send('Page.stopScreencast');
+    }
+
+    const client = await this._buildClient(page);
+    this._clients.push(client);
+    this._listenForFrames(client);
+
+    await client.send('Page.startScreencast', {
       everyNthFrame: 1,
     });
+  }
+
+  private async _deactivatePage(page: Page): Promise<void> {
+    debug('deactivating page: ', page.url());
+
+    this._clients.pop();
+
+    const previousClient = this._getActiveClient();
+    try {
+      // capture error so it does not propagate to the user
+      // most likely it is due to the original page closing
+      await previousClient.send('Page.startScreencast', {
+        everyNthFrame: 1,
+      });
+    } catch (e) {
+      debug('error reactivating original page %j', e.message);
+    }
   }
 
   public async start(): Promise<void> {
     debug('start');
 
-    await this._activatePage(this._page);
+    await this._activatePage(this._originalPage);
+
+    if (this._followPopups) {
+      this._installPopupFollower(this._originalPage);
+    }
   }
 
   public async stop(): Promise<number> {
@@ -97,6 +158,10 @@ export class ScreencastFrameCollector extends EventEmitter {
       throw new Error(
         'pw-video: Cannot call stop twice on the same capture.',
       );
+    }
+
+    if (this._followPopups) {
+      this._uninstallPopupFollower(this._originalPage);
     }
 
     this._stoppedTimestamp = Date.now() / 1000;
@@ -111,7 +176,9 @@ export class ScreencastFrameCollector extends EventEmitter {
 
     try {
       debug('detaching client');
-      await this._client.detach();
+      for (const client of this._clients) {
+        await client.detach();
+      }
     } catch (e) {
       debug('error detaching client', e.message);
     }

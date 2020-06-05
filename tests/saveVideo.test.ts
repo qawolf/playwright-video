@@ -36,4 +36,17 @@ describe('saveVideo', () => {
 
     await page.close();
   });
+
+  it('passes followPopups option to PageVideoCapture', async () => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    const savePath = join(tmpdir(), `${Date.now()}.mp4`);
+
+    const capture = await saveVideo(page, savePath, { followPopups: true });
+
+    expect(capture._collector._followPopups).toBe(true);
+
+    await capture.stop();
+    await page.close();
+  });
 });

@@ -1,9 +1,10 @@
 import { Page } from 'playwright-core';
-import { PageVideoCapture } from './PageVideoCapture';
+import { PageVideoCapture, CaptureOptions } from './PageVideoCapture';
 
 export const saveVideo = (
   page: Page,
   savePath: string,
+  options?: CaptureOptions,
 ): Promise<PageVideoCapture> => {
-  return PageVideoCapture.start({ page, savePath });
+  return PageVideoCapture.start({ page, savePath, options });
 };

@@ -31,6 +31,19 @@ describe('PageVideoCapture', () => {
     await page.close();
   });
 
+  it('passes followPopups option to the collector', async () => {
+    const page = await browser.newPage();
+    const savePath = buildSavePath();
+    const options = { followPopups: true };
+
+    const capture = await PageVideoCapture.start({ page, savePath, options });
+
+    expect(capture._collector._followPopups).toBe(true);
+
+    await capture.stop();
+    await page.close();
+  });
+
   it('stops on page close', async () => {
     const page = await browser.newPage();
 

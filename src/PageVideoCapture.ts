@@ -9,6 +9,10 @@ import { VideoWriter } from './VideoWriter';
 
 const debug = Debug('pw-video:PageVideoCapture');
 
+export interface CaptureOptions {
+  followPopups: boolean;
+}
+
 interface ConstructorArgs {
   collector: ScreencastFrameCollector;
   queue: SortedFrameQueue;
@@ -16,19 +20,21 @@ interface ConstructorArgs {
   writer: VideoWriter;
 }
 
-interface CreateArgs {
+interface StartArgs {
   page: Page;
   savePath: string;
+  options?: CaptureOptions;
 }
 
 export class PageVideoCapture {
   public static async start({
     page,
     savePath,
-  }: CreateArgs): Promise<PageVideoCapture> {
+    options,
+  }: StartArgs): Promise<PageVideoCapture> {
     debug('start');
 
-    const collector = await ScreencastFrameCollector.create(page);
+    const collector = await ScreencastFrameCollector.create(page, options);
     const queue = new SortedFrameQueue();
     const writer = await VideoWriter.create(savePath);
 
@@ -38,7 +44,8 @@ export class PageVideoCapture {
     return capture;
   }
 
-  private _collector: ScreencastFrameCollector;
+  // public for tests
+  public _collector: ScreencastFrameCollector;
   private _previousFrame?: ScreencastFrame;
   private _queue: SortedFrameQueue;
   // public for tests
