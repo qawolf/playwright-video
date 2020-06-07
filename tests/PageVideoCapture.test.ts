@@ -13,7 +13,9 @@ describe('PageVideoCapture', () => {
     browser = await chromium.launch();
   });
 
-  afterAll(() => browser.close());
+  afterAll(async () => {
+    await browser.close();
+  });
 
   it('captures a video of the page', async () => {
     const page = await browser.newPage();
@@ -26,6 +28,19 @@ describe('PageVideoCapture', () => {
     const videoPathExists = await pathExists(savePath);
     expect(videoPathExists).toBe(true);
 
+    await page.close();
+  });
+
+  it('passes followPopups option to the collector', async () => {
+    const page = await browser.newPage();
+    const savePath = buildSavePath();
+    const options = { followPopups: true };
+
+    const capture = await PageVideoCapture.start({ page, savePath, options });
+
+    expect(capture._collector._followPopups).toBe(true);
+
+    await capture.stop();
     await page.close();
   });
 
