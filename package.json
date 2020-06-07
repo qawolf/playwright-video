@@ -2,7 +2,7 @@
   "author": "QA Wolf",
   "name": "playwright-video",
   "license": "BSD-3-Clause-Clear",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Capture a video of a Playwright page",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
