@@ -1,5 +1,5 @@
 import { Page } from 'playwright-core';
-import { PageVideoCapture, CaptureOptions } from './PageVideoCapture';
+import { CaptureOptions, PageVideoCapture } from './PageVideoCapture';
 
 export const saveVideo = (
   page: Page,

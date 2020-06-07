@@ -19,7 +19,7 @@
     "watch": "tsc -w -p tsconfig.release.json",
     "lint": "eslint . --ext .ts,.tsx",
     "release": "np --no-cleanup",
-    "test": "jest --runInBand",
+    "test": "jest",
     "test:watch": "jest --watch",
     "version": "npm run clean && npm run build"
   },
