@@ -54,6 +54,7 @@
     "jest": "^26.0.1",
     "np": "^6.2.4",
     "playwright": "^1.1.0",
+    "playwright-core": "^1.1.0",
     "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
     "ts-jest": "^26.1.0",
