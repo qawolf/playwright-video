@@ -1,24 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "ES2019",
     "module": "commonjs",
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "allowJs": true,
-    "importHelpers": true,
-    "jsx": "react",
-    "alwaysStrict": true,
+    "declaration": true,
     "sourceMap": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitAny": false,
-    "noImplicitThis": false,
-    "skipLibCheck": true,
-    "strictNullChecks": false,
-    "declaration": true
+    "rootDir": "./src",
+    "outDir": "./build"
   },
-  "include": ["src/**/*", "tests/**/*"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
 }
