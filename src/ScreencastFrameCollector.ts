@@ -1,6 +1,6 @@
 import Debug from 'debug';
 import { EventEmitter } from 'events';
-import { CDPSession, ChromiumBrowserContext, Page } from 'playwright';
+import type { CDPSession, ChromiumBrowserContext, Page } from 'playwright';
 import { CaptureOptions } from './PageVideoCapture';
 import { ensurePageType } from './utils';
 

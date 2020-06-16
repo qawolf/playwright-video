@@ -1,5 +1,5 @@
 import Debug from 'debug';
-import { Page } from 'playwright';
+import type { Page } from 'playwright';
 import { SortedFrameQueue } from './SortedFrameQueue';
 import {
   ScreencastFrame,

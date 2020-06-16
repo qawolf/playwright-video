@@ -1,5 +1,5 @@
 import { setFfmpegPath as setFluentFfmpegPath } from 'fluent-ffmpeg';
-import { ChromiumBrowserContext, Page } from 'playwright';
+import type { ChromiumBrowserContext, Page } from 'playwright';
 
 export const getFfmpegFromModule = (): string | null => {
   try {
