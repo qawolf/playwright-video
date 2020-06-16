@@ -1,6 +1,6 @@
 import Debug from 'debug';
 import { EventEmitter } from 'events';
-import { CDPSession, ChromiumBrowserContext, Page } from 'playwright-core';
+import { CDPSession, ChromiumBrowserContext, Page } from 'playwright';
 import { CaptureOptions } from './PageVideoCapture';
 import { ensurePageType } from './utils';
 
@@ -13,7 +13,10 @@ export interface ScreencastFrame {
 }
 
 export class ScreencastFrameCollector extends EventEmitter {
-  public static async create(originalPage: Page, options?: CaptureOptions): Promise<ScreencastFrameCollector> {
+  public static async create(
+    originalPage: Page,
+    options?: CaptureOptions,
+  ): Promise<ScreencastFrameCollector> {
     ensurePageType(originalPage);
 
     const collector = new ScreencastFrameCollector(originalPage, options);
@@ -79,7 +82,10 @@ export class ScreencastFrameCollector extends EventEmitter {
           return;
         }
 
-        if (this._stoppedTimestamp && payload.metadata.timestamp > this._stoppedTimestamp) {
+        if (
+          this._stoppedTimestamp &&
+          payload.metadata.timestamp > this._stoppedTimestamp
+        ) {
           debug('all frames received');
           resolve();
           return;
@@ -155,9 +161,7 @@ export class ScreencastFrameCollector extends EventEmitter {
 
   public async stop(): Promise<number> {
     if (this._stoppedTimestamp) {
-      throw new Error(
-        'pw-video: Cannot call stop twice on the same capture.',
-      );
+      throw new Error('pw-video: Cannot call stop twice on the same capture.');
     }
 
     if (this._followPopups) {
