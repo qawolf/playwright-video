@@ -16,7 +16,7 @@ export class VideoWriter extends EventEmitter {
   }
 
   private _endedPromise: Promise<void>;
-  private _framesPerSecond = 25;
+  private _framesPerSecond = 60;
   private _receivedFrame = false;
   private _stopped = false;
   private _stream: PassThrough = new PassThrough();
@@ -38,7 +38,7 @@ export class VideoWriter extends EventEmitter {
         .inputFPS(this._framesPerSecond)
         .outputOptions('-preset ultrafast')
         .outputOptions('-pix_fmt yuv420p')
-        .on('error', (e) => {
+        .on('error', e => {
           this.emit('ffmpegerror', e.message);
 
           // do not reject as a result of not having frames
