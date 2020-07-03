@@ -11,6 +11,7 @@ const debug = Debug('pw-video:PageVideoCapture');
 
 export interface CaptureOptions {
   followPopups: boolean;
+  fps?: number;
 }
 
 interface ConstructorArgs {
@@ -36,7 +37,7 @@ export class PageVideoCapture {
 
     const collector = await ScreencastFrameCollector.create(page, options);
     const queue = new SortedFrameQueue();
-    const writer = await VideoWriter.create(savePath);
+    const writer = await VideoWriter.create(savePath, options);
 
     const capture = new PageVideoCapture({ collector, queue, page, writer });
     await collector.start();

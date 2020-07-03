@@ -47,6 +47,7 @@ The video will be saved at the specified `savePath` (`/tmp/video.mp4` in the abo
 - `savePath` <[string]> Where to save the video.
 - `options` <[Object]>
   - `followPopups` <[boolean]> Whether or not to follow browser focus when popups are opened. Defaults to `false`. Note: this option will only work correctly if the popups opened are the same size as the original page. If a smaller or larger popup is open, frames will be scaled to fit the original size.
+  - `fps` <[number]> The frames per second for the recording. Defaults to `25`. A higher number will improve the recording quality but also increase the file size.
 - returns: <[Promise]<[PageVideoCapture](#class-pagevideocapture)>>
 
 Records video of a page and saves it at the specified path.
