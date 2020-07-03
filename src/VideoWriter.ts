@@ -16,7 +16,7 @@ export class VideoWriter extends EventEmitter {
   }
 
   private _endedPromise: Promise<void>;
-  private _framesPerSecond = 60;
+  private _framesPerSecond = 25;
   private _receivedFrame = false;
   private _stopped = false;
   private _stream: PassThrough = new PassThrough();
