@@ -5,14 +5,18 @@ import { ensureDir } from 'fs-extra';
 import { dirname } from 'path';
 import { PassThrough } from 'stream';
 import { ensureFfmpegPath } from './utils';
+import { CaptureOptions } from './PageVideoCapture';
 
 const debug = Debug('pw-video:VideoWriter');
 
 export class VideoWriter extends EventEmitter {
-  public static async create(savePath: string): Promise<VideoWriter> {
+  public static async create(
+    savePath: string,
+    options?: CaptureOptions,
+  ): Promise<VideoWriter> {
     await ensureDir(dirname(savePath));
 
-    return new VideoWriter(savePath);
+    return new VideoWriter(savePath, options);
   }
 
   private _endedPromise: Promise<void>;
@@ -21,10 +25,13 @@ export class VideoWriter extends EventEmitter {
   private _stopped = false;
   private _stream: PassThrough = new PassThrough();
 
-  protected constructor(savePath: string) {
+  protected constructor(savePath: string, options?: CaptureOptions) {
     super();
 
     ensureFfmpegPath();
+    if (options && options.fps) {
+      this._framesPerSecond = options.fps;
+    }
     this._writeVideo(savePath);
   }
 
