@@ -1,6 +1,6 @@
 import Debug from 'debug';
 import { EventEmitter } from 'events';
-import * as ffmpeg from 'fluent-ffmpeg';
+import ffmpeg from 'fluent-ffmpeg';
 import { ensureDir } from 'fs-extra';
 import { dirname } from 'path';
 import { PassThrough } from 'stream';
