@@ -54,9 +54,6 @@ export class ScreencastFrameCollector extends EventEmitter {
   }
 
   private _uninstallPopupFollower(page: Page): void {
-    // Fixed in https://github.com/microsoft/playwright/pull/2307
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     page.off('popup', this._popupFollower);
   }
 
@@ -111,19 +108,38 @@ export class ScreencastFrameCollector extends EventEmitter {
   private async _activatePage(page: Page): Promise<void> {
     debug('activating page: ', page.url());
 
+    let client;
+
+    try {
+      client = await this._buildClient(page);
+    } catch (e) {
+      // capture error so it does not propagate to the user
+      // this is most likely due to the page not being open
+      // long enough to attach the CDP session
+      debug('error building client %j', e.message);
+      return;
+    }
+
     const previousClient = this._getActiveClient();
 
     if (previousClient) {
       await previousClient.send('Page.stopScreencast');
     }
 
-    const client = await this._buildClient(page);
     this._clients.push(client);
     this._listenForFrames(client);
 
-    await client.send('Page.startScreencast', {
-      everyNthFrame: 1,
-    });
+    try {
+      await client.send('Page.startScreencast', {
+        everyNthFrame: 1,
+      });
+    } catch (e) {
+      // capture error so it does not propagate to the user
+      // this is most likely due to the page not being open
+      // long enough to start recording after attaching the CDP session
+      this._deactivatePage(page);
+      debug('error activating page %j', e.message);
+    }
   }
 
   private async _deactivatePage(page: Page): Promise<void> {
@@ -139,7 +155,7 @@ export class ScreencastFrameCollector extends EventEmitter {
         everyNthFrame: 1,
       });
     } catch (e) {
-      debug('error reactivating original page %j', e.message);
+      debug('error reactivating previous page %j', e.message);
     }
   }
 
