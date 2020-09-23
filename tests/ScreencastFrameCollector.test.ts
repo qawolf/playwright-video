@@ -100,12 +100,14 @@ describe('ScreencastFrameCollector', () => {
     const collector = await ScreencastFrameCollector.create(page);
     await collector.start();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const client = collector._clients[0] as any;
+    const client = collector._clients[0];
 
-    expect(client._connection).toBeTruthy();
+    const detachSpy = jest.spyOn(client, "detach");
+    expect(detachSpy).not.toHaveBeenCalled();
+
     await collector.stop();
-    expect(client._connection).toBeNull();
+    
+    expect(detachSpy).toHaveBeenCalledTimes(1);
 
     await page.close();
   });
